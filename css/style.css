@@ -1,0 +1,75 @@
+.lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    padding: 30px;
+}
+
+.lesson-card {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.lesson-image {
+    flex-shrink: 0;
+}
+
+.lesson-image img {
+    width: 180px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.lesson-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.lesson-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.lesson-id {
+    margin: 10px 0;
+}
+
+.lesson-location {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.lesson-price {
+    font-weight: bold;
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+.lesson-availability {
+    font-weight: bold;
+    font-size: 16px;
+    color: #007bff;
+    margin: 10px 0;
+}
+
+.add-to-cart {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: auto;
+    align-self: flex-end;
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <div id="app">
+        <div class="lesson-grid">
+
+            <div class="lesson-card">
+
+                <div class="lesson-image">
+                    <img v-bind:src="lesson.image" alt="{{ lesson.imageText }}">
+                </div>
+
+                <div class="lesson-info">
+                    <h2 class="lesson-title" v-text="lesson.title"></h2>
+                    <p class="lesson-id">Lesson ID: {{ lesson.id }}</p>
+                    <p class="lesson-location">Location: {{ lesson.location }}</p>
+                    <p class="lesson-price">Price: £{{ lesson.price }}</p>
+                    <p class="lesson-availability">Availability: {{ lesson.availability }}</p>
+                    <button class="add-to-cart" v-on:click="addToCart()" :disabled="!canAddToCart">Add to Cart</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        const { createApp } = Vue
+        const lessonStore = createApp({
+            data() {
+                return {
+                    heading: 'After School Art Club',
+                    lesson: {
+                        title: 'Painting and Drawing',
+                        id: 1001,
+                        location: 'Hendon',
+                        price: 49.99,
+                        image: "images/art.jpg",
+                        imageText: "Art Lesson Image",
+                        availability: 10
+                    },
+                    cart: []
+                }
+            }, 
+            methods: {
+                addToCart(){
+                    this.cart.push(this.lesson.id);
+                    this.lesson.availability--;
+                }
+            },
+            computed:{
+                canAddToCart(){
+                    return this.lesson.availability > 0;
+                }
+            }
+        })
+        lessonStore.mount('#app')
+    </script>
+</body>
+
+</html>
