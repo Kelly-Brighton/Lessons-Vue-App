@@ -10,36 +10,38 @@
 
 <body>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-
+    <h1 class="heading">Extra Curricular Activities</h1>
     <div id="app">
         <!--Cart button-->
+        
         <button class="checkout" @click="toggleCart" :disabled="!canShowCart">Checkout ({{ numberOfItems }})</button>
 
         <main>
             <!--Display cart-->
             <div v-if="displayCart">
                 <h2>Shopping Cart</h2>
-                
+
             </div>
 
             <!--Display lessons-->
             <div v-else>
-                <div class="lesson-grid"> <!-- Lesson cards -->
+                <div v-for="lesson in lessons">
+                    <div class="lesson-grid"> <!-- Lesson cards -->
 
-                    <div class="lesson-card">
+                        <div class="lesson-card">
 
-                        <div class="lesson-image">
-                            <img v-bind:src="lesson.image" alt="{{ lesson.imageText }}">
-                        </div>
+                            <div class="lesson-image">
+                                <img v-bind:src="lesson.image" alt="{{ lesson.imageText }}">
+                            </div>
 
-                        <div class="lesson-info">
-                            <h2 class="lesson-title" v-text="lesson.title"></h2>
-                            <p class="lesson-id">Lesson ID: {{ lesson.id }}</p>
-                            <p class="lesson-location">Location: {{ lesson.location }}</p>
-                            <p class="lesson-price">Price: £{{ lesson.price }}</p>
-                            <p class="lesson-availability">Availability: {{ lesson.availability }}</p>
-                            <button class="add-to-cart" v-on:click="addToCart()" :disabled="!canAddToCart">Add to
-                                Cart</button>
+                            <div class="lesson-info">
+                                <h2 class="lesson-title" v-text="lesson.title"></h2>
+                                <p class="lesson-id">Lesson ID: {{ lesson.id }}</p>
+                                <p class="lesson-location">Location: {{ lesson.location }}</p>
+                                <p class="lesson-price">Price: £{{ lesson.price }}</p>
+                                <p class="lesson-availability">Availability: {{ lesson.availability }}</p>
+                                <button class="add-to-cart" v-on:click="addToCart(lesson)" :disabled="!canAddToCart">Add to Cart</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -54,38 +56,58 @@
             data() {
                 return {
                     heading: 'After School Art Club',
-                    lesson: {
-                        title: 'Painting and Drawing',
-                        id: 1001,
-                        location: 'Hendon',
-                        price: 49.99,
-                        image: "images/art.jpg",
-                        imageText: "Art Lesson Image",
-                        availability: 10
-                    },
+                    lessons: [
+                        {
+                            title: 'Painting and Drawing',
+                            id: 1001,
+                            location: 'Hendon',
+                            price: 49.99,
+                            image: "images/art.jpg",
+                            imageText: "Art Lesson Image",
+                            availability: 5
+                        },
+                        {
+                            title: 'Sculpture and Clay Modelling',
+                            id: 1002,
+                            location: 'Hendon',
+                            price: 59.99,
+                            image: "images/sculptor.jpeg",
+                            imageText: "Sculpture Lesson Image",
+                            availability: 5
+                        },
+                        {
+                            title: 'Photography Basics',
+                            id: 1003,
+                            location: 'Hendon',
+                            price: 39.99,
+                            image: "images/photography.webp",
+                            imageText: "Photography Lesson Image",
+                            availability: 5
+                        }
+                    ],
                     cart: [],
                     displayCart: false
                 }
             },
             methods: {
-                addToCart() { // Add lesson to cart and decrease availability
-                    this.cart.push(this.lesson.id);
-                    this.lesson.availability--;
+                addToCart(lesson) { // Add lesson to cart and decrease availability
+                    this.cart.push(lesson.id);
+                    lesson.availability--;
                 },
                 checkout() { // Proceed to checkout
                     alert('Checkout functionality would go here.');
                 },
                 toggleCart() { // Toggle the display of the cart
                     this.displayCart = this.displayCart ? false : true;
+                },
+                canAddToCart(lesson) { // Check if the lesson can be added to the cart
+                    return lesson.availability > 0;
                 }
             },
             computed: {
-                canAddToCart: function () { // Check if lesson can be added to cart based on availability
-                    return this.lesson.availability > 0;
-                },
                 numberOfItems: function () { // Return the number of items in the cart
                     return this.cart.length;
-                }, 
+                },
                 canShowCart: function () { // Check if the cart has items to display
                     return this.cart.length > 0;
                 }

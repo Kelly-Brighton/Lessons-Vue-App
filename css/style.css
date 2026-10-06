@@ -5,6 +5,13 @@
     padding: 30px;
 }
 
+.heading{
+    text-align: center;
+    font-size: 36px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
 .lesson-card {
     display: flex;
     gap: 20px;
