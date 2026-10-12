@@ -11,20 +11,29 @@
 <body>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <h1 class="heading">Extra Curricular Activities</h1>
-    <div id="app">
-        <!--Cart button-->
-        
-        <button class="checkout" @click="toggleCart" :disabled="!canShowCart">Checkout ({{ numberOfItems }})</button>
 
+    <div id="app">
         <main>
             <!--Display cart-->
             <div v-if="displayCart">
-                <h2>Shopping Cart</h2>
-
+                <h2>Checkout</h2>
+                <button class="checkout" @click="toggleCart">Return to Lessons</button>
+                <p>First name: <input type="text" v-model="order.name"></p>
+                <p>Phone: <input type="tel" v-model="order.phone"></p>
+                <ul>
+                    <li v-for="lesson in displayUniqueLessons(cart)">
+                        <p>{{ lesson.lesson.title }} - ({{ lesson.count }}) <button
+                                class="remove-from-cart" @click="removeFromCart(lesson)">Remove</button></p>
+                    </li>
+                </ul>
+                <button class="checkout" @click="providedInformation()" :disabled="!provideInformation">Checkout</button>
             </div>
 
             <!--Display lessons-->
             <div v-else>
+                <button class="checkout" @click="toggleCart" :disabled="!canShowCart">Checkout ({{
+                    numberOfItems}})</button>
+
                 <div v-for="lesson in lessons">
                     <div class="lesson-grid"> <!-- Lesson cards -->
 
@@ -40,7 +49,8 @@
                                 <p class="lesson-location">Location: {{ lesson.location }}</p>
                                 <p class="lesson-price">Price: £{{ lesson.price }}</p>
                                 <p class="lesson-availability">Availability: {{ lesson.availability }}</p>
-                                <button class="add-to-cart" v-on:click="addToCart(lesson)" :disabled="!canAddToCart">Add to Cart</button>
+                                <button class="add-to-cart" v-on:click="addToCart(lesson)" :disabled="!canAddToCart">Add
+                                    to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -86,31 +96,103 @@
                         }
                     ],
                     cart: [],
-                    displayCart: false
+                    displayCart: false,
+                    order: {
+                        name: '',
+                        phone: ''
+                    }
                 }
             },
+
             methods: {
-                addToCart(lesson) { // Add lesson to cart and decrease availability
-                    this.cart.push(lesson.id);
+                // Add lesson to cart and decrease availability
+                addToCart(lesson) {
+                    this.cart.push(lesson);
                     lesson.availability--;
                 },
-                checkout() { // Proceed to checkout
-                    alert('Checkout functionality would go here.');
-                },
-                toggleCart() { // Toggle the display of the cart
+                // Toggle the display of the cart
+                toggleCart() {
                     this.displayCart = this.displayCart ? false : true;
                 },
-                canAddToCart(lesson) { // Check if the lesson can be added to the cart
+                // Check if the lesson can be added to the cart
+                canAddToCart(lesson) {
                     return lesson.availability > 0;
+                },
+            
+                // Count the number of times a lesson has been added to the cart
+                lessonCount(id) {
+                    let count = 0;
+                    for (let i = 0; i < this.cart.length; i++) {
+                        if (this.cart[i].id === id) {
+                            count++;
+                        }
+                    }
+                    return count;
+                },
+
+                // Display unique lessons in the cart with their counts
+                displayUniqueLessons(cart) {
+                    const lessons = new Object();
+                    for (let i = 0; i < cart.length; i++) {
+                        const lesson = cart[i];
+                        if (lessons[lesson.id]) {
+                            lessons[lesson.id].count++;
+                        }
+                        else {
+                            lessons[lesson.id] = {
+                                lesson: lesson,
+                                count: 1
+                            }
+                        }
+                    }
+                    return lessons;
+                },
+
+                // Remove a lesson from the cart and increase availability
+                removeFromCart(lesson) {
+                    const index = this.cart.findIndex(item => item.id === lesson.lesson.id);
+
+                    if(index !== -1){
+                        this.cart.splice(index, 1);
+                        lesson.lesson.availability++;
+                        lesson.count--;
+                    }
+                },
+
+                // Check if the order information has been provided
+                providedInformation(){
+                    //Validate name
+                    const nameValue = this.order.name.trim();
+                    let namePattern = /^[a-zA-Z\s]+$/s;
+                    const phoneValue = this.order.phone.trim();
+                    let phonePattern = /^\d{11}$/;
+
+                    if(!namePattern.test(nameValue)){
+                        alert("Please enter a valid name (letters only).");
+                    }
+                    else if(!phonePattern.test(phoneValue)){
+                        alert("Please enter a valid phone number (10 digits).");
+                    }
+                    else{
+                        alert("Thank you for your order! We will contact you shortly.");
+                        this.cart = [];
+                    }
                 }
             },
+
             computed: {
-                numberOfItems: function () { // Return the number of items in the cart
+                // Return the number of items in the cart
+                numberOfItems: function () {
                     return this.cart.length;
                 },
-                canShowCart: function () { // Check if the cart has items to display
+                // Check if the cart has items to display
+                canShowCart: function () {
                     return this.cart.length > 0;
+                },
+                provideInformation: function () {
+                    return this.order.name !== '' && this.order.phone !== '';
                 }
+
             }
         })
         lessonStore.mount('#app')

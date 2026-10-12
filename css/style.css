@@ -91,3 +91,14 @@
     margin-top: auto;
     align-self: flex-end;
 }
+
+.remove-from-cart {
+    padding: 5px 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 10px;
+}
