@@ -66,35 +66,7 @@
             data() {
                 return {
                     heading: 'After School Art Club',
-                    lessons: [
-                        {
-                            title: 'Painting and Drawing',
-                            id: 1001,
-                            location: 'Hendon',
-                            price: 49.99,
-                            image: "images/art.jpg",
-                            imageText: "Art Lesson Image",
-                            availability: 5
-                        },
-                        {
-                            title: 'Sculpture and Clay Modelling',
-                            id: 1002,
-                            location: 'Hendon',
-                            price: 59.99,
-                            image: "images/sculptor.jpeg",
-                            imageText: "Sculpture Lesson Image",
-                            availability: 5
-                        },
-                        {
-                            title: 'Photography Basics',
-                            id: 1003,
-                            location: 'Hendon',
-                            price: 39.99,
-                            image: "images/photography.webp",
-                            imageText: "Photography Lesson Image",
-                            availability: 5
-                        }
-                    ],
+                    lessons: [],
                     cart: [],
                     displayCart: false,
                     order: {
@@ -102,6 +74,10 @@
                         phone: ''
                     }
                 }
+            },
+
+            created(){
+                this.fetchData();
             },
 
             methods: {
@@ -157,6 +133,13 @@
                         lesson.lesson.availability++;
                         lesson.count--;
                     }
+                },
+
+                //Fetch data from the API
+                async fetchData(){
+                    const url = "http://localhost:3000/";
+                    let response = await (fetch(url));
+                    this.lessons = await response.json();
                 },
 
                 // Check if the order information has been provided
