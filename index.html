@@ -15,18 +15,57 @@
     <div id="app">
         <main>
             <!--Display cart-->
-            <div v-if="displayCart">
-                <h2>Checkout</h2>
-                <button class="checkout" @click="toggleCart">Return to Lessons</button>
-                <p>First name: <input type="text" v-model="order.name"></p>
-                <p>Phone: <input type="tel" v-model="order.phone"></p>
-                <ul>
-                    <li v-for="lesson in displayUniqueLessons(cart)">
-                        <p>{{ lesson.lesson.title }} - ({{ lesson.count }}) <button
-                                class="remove-from-cart" @click="removeFromCart(lesson)">Remove</button></p>
-                    </li>
-                </ul>
-                <button class="checkout" @click="providedInformation()" :disabled="!provideInformation">Checkout</button>
+            <div v-if="displayCart" class="checkout-panel">
+                <h2 class="checkout-title">Your Order</h2>
+                <p class="checkout-subtitle">Review your selected lessons before checkout.</p>
+
+                <div class="checkout-section">
+                    <h3 class="checkout-section-title">Order Summary</h3>
+
+                    <ul class="order-list">
+                        <li class="order-item" v-for="lesson in displayUniqueLessons(cart)">
+                            <div class="order-item-info">
+                                <h4 class="order-item-title">
+                                    {{ lesson.lesson.title }}
+                                </h4>
+
+                                <p class="order-item-details">
+                                    Quantity: {{ lesson.count }}
+                                </p>
+
+                                <p class="order-item-details">
+                                    £{{ lesson.lesson.price }} each
+                                </p>
+                            </div>
+
+                            <button class="remove-from-cart" @click="removeFromCart(lesson)">Remove</button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="checkout-section customer-details">
+                    <h3 class="checkout-section-title">Customer details</h3>
+
+                    <div class="form-group">
+                        <label for="customer-name">First Name</label>
+
+                        <input id="customer-name" type="text" v-model="order.name" placeholder="Enter your first name">
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer-phone">Phone Number</label>
+
+                        <input id="customer-phone" type="tel" v-model="order.phone"
+                            placeholder="Enter your phone number">
+                    </div>
+                </div>
+
+                <div class="checkout-actions">
+                    <button class="checkout return-to-lessons" @click="toggleCart">Continue Shopping</button>
+
+                    <button class="checkout place-order" @click="providedInformation">Place Order</button>
+                </div>
             </div>
 
             <!--Display lessons-->
@@ -34,7 +73,18 @@
                 <button class="checkout" @click="toggleCart" :disabled="!canShowCart">Checkout ({{
                     numberOfItems}})</button>
 
-                <div v-for="lesson in lessons">
+                <button class="sortByPrice" @click="toggleSorting"> {{ lessonSorted ? "Sorting in Descending" : "Sorting
+                    in Ascending" }}</button>
+                <p>Sort by: </p>
+                <select class=sort-select v-model="sortType">
+                    <option disabled value="unknown">Choose</option>
+                    <option value="price">Price</option>
+                    <option value="availability">Availability</option>
+                    <option value="title">Subject</option>
+                    <option value="loacation">Location</option>
+                </select>
+
+                <div v-for="lesson in sortedLessons">
                     <div class="lesson-grid"> <!-- Lesson cards -->
 
                         <div class="lesson-card">
@@ -72,11 +122,13 @@
                     order: {
                         name: '',
                         phone: ''
-                    }
+                    },
+                    lessonSorted: false,
+                    sortType: 'unknown'
                 }
             },
 
-            created(){
+            created() {
                 this.fetchData();
             },
 
@@ -90,11 +142,17 @@
                 toggleCart() {
                     this.displayCart = this.displayCart ? false : true;
                 },
+
+                // Toggle the sorting of the lessons
+                toggleSorting() {
+                    this.lessonSorted = this.lessonSorted ? false : true;
+                },
+
                 // Check if the lesson can be added to the cart
                 canAddToCart(lesson) {
                     return lesson.availability > 0;
                 },
-            
+
                 // Count the number of times a lesson has been added to the cart
                 lessonCount(id) {
                     let count = 0;
@@ -128,7 +186,7 @@
                 removeFromCart(lesson) {
                     const index = this.cart.findIndex(item => item.id === lesson.lesson.id);
 
-                    if(index !== -1){
+                    if (index !== -1) {
                         this.cart.splice(index, 1);
                         lesson.lesson.availability++;
                         lesson.count--;
@@ -136,28 +194,30 @@
                 },
 
                 //Fetch data from the API
-                async fetchData(){
+                async fetchData() {
                     const url = "http://localhost:3000/";
                     let response = await (fetch(url));
                     this.lessons = await response.json();
                 },
 
                 // Check if the order information has been provided
-                providedInformation(){
+                providedInformation() {
                     //Validate name
                     const nameValue = this.order.name.trim();
                     let namePattern = /^[a-zA-Z\s]+$/s;
                     const phoneValue = this.order.phone.trim();
                     let phonePattern = /^\d{11}$/;
 
-                    if(!namePattern.test(nameValue)){
+                    if (!namePattern.test(nameValue)) {
                         alert("Please enter a valid name (letters only).");
                     }
-                    else if(!phonePattern.test(phoneValue)){
+                    else if (!phonePattern.test(phoneValue)) {
                         alert("Please enter a valid phone number (10 digits).");
                     }
-                    else{
+                    else {
                         alert("Thank you for your order! We will contact you shortly.");
+                        this.order.name = '';
+                        this.order.phone = '';
                         this.cart = [];
                     }
                 }
@@ -174,10 +234,31 @@
                 },
                 provideInformation: function () {
                     return this.order.name !== '' && this.order.phone !== '';
+                },
+                sortedLessons: function () {
+                    const lessons = this.lessons;
+
+                    // Return default response when selection is at 'unknown'
+                    if (this.sortType === 'unknown') {
+                        return lessons;
+                    }
+
+                    // Sort the numeric options and return ascending or descending depending on the boolean value of lessonSorted
+                    return lessons.sort((a, b) => {
+                        if (this.sortType === 'price' || this.sortType === 'availability') {
+                            return this.lessonSorted ? a[this.sortType] - b[this.sortType] : b[this.sortType] - a[this.sortType];
+                        }
+
+                        // Sort the string options and save the returned value (negative or positive)
+                        const result = a[this.sortType].localeCompare(b[this.sortType]);
+
+                        return this.lessonSorted ? -result : result;
+                    });
+
                 }
 
             }
-        })
+        });
         lessonStore.mount('#app')
     </script>
 </body>
