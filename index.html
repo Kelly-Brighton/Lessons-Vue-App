@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 
 <body>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <h1 class="heading">Extra Curricular Activities</h1>
 
     <div id="app">
@@ -73,8 +73,9 @@
                 <button class="checkout" @click="toggleCart" :disabled="!canShowCart">Checkout ({{
                     numberOfItems}})</button>
 
-                <button class="sortByPrice" @click="toggleSorting"> {{ lessonSorted ? "Sorting in Descending" : "Sorting
-                    in Ascending" }}</button>
+                <button class="sortByPrice" @click="toggleSorting">
+                    {{ lessonSorted ? 'Sorting in Descending' : 'Sorting in Ascending' }}
+                </button>
                 <p>Sort by: </p>
                 <select class=sort-select v-model="sortType">
                     <option disabled value="unknown">Choose</option>
@@ -90,7 +91,7 @@
                         <div class="lesson-card">
 
                             <div class="lesson-image">
-                                <img v-bind:src="lesson.image" alt="{{ lesson.imageText }}">
+                                <img :src="imageAddress(lesson)" alt="{{ lesson.imageText }}">
                             </div>
 
                             <div class="lesson-info">
@@ -111,6 +112,7 @@
     </div>
 
     <script type="module">
+        const LESSON_URL = "http://localhost:3000"
         const { createApp } = Vue
         const lessonStore = createApp({
             data() {
@@ -195,13 +197,13 @@
 
                 //Fetch data from the API
                 async fetchData() {
-                    const url = "http://localhost:3000/";
+                    const url = LESSON_URL + "/lessons";
                     let response = await (fetch(url));
                     this.lessons = await response.json();
                 },
 
                 // Check if the order information has been provided
-                providedInformation() {
+                async providedInformation() {
                     //Validate name
                     const nameValue = this.order.name.trim();
                     let namePattern = /^[a-zA-Z\s]+$/s;
@@ -215,11 +217,43 @@
                         alert("Please enter a valid phone number (10 digits).");
                     }
                     else {
-                        alert("Thank you for your order! We will contact you shortly.");
-                        this.order.name = '';
-                        this.order.phone = '';
-                        this.cart = [];
+                        const orderData = {
+                            name: nameValue,
+                            phone: phoneValue,
+                            lessons: Object.values(this.displayUniqueLessons(this.cart)).map(item => ({
+                                id: item.lesson.id,
+                                title: item.lesson.title,
+                                price: item.lesson.price,
+                                quantity: item.count
+                            }))
+                        };
+
+                        const url = LESSON_URL +"/orders"
+                        const options = {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(orderData)
+                        }
+
+                        let response = await(fetch(url, options));
+
+                        if (response.ok) {
+                            alert("Thank you for your order! We will contact you shortly.");
+                            this.order.name = "";
+                            this.order.phone = "";
+                            this.cart = [];
+                        }
+                        else {
+                            alert("Your order could not be submitted. Please try again.");
+                        }
                     }
+
+                },
+
+                imageAddress(product) {
+                    return LESSON_URL + "/images/" + product.image;
                 }
             },
 
