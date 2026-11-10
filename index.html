@@ -228,7 +228,7 @@
                             }))
                         };
 
-                        const url = LESSON_URL +"/orders"
+                        const url = LESSON_URL + "/orders"
                         const options = {
                             method: 'POST',
                             headers: {
@@ -240,6 +240,11 @@
                         let response = await(fetch(url, options));
 
                         if (response.ok) {
+                            const uniqueLessons = Object.values(this.displayUniqueLessons(this.cart));
+
+                            for(const item of uniqueLessons){
+                                await this.updateLesson(item.lesson, item.count);
+                            }
                             alert("Thank you for your order! We will contact you shortly.");
                             this.order.name = "";
                             this.order.phone = "";
@@ -254,6 +259,22 @@
 
                 imageAddress(product) {
                     return LESSON_URL + "/images/" + product.image;
+                },
+
+                async updateLesson(lesson, count){
+                    let updateBody = {
+                        availability : lesson.availability
+                    };
+
+                    const url = LESSON_URL + "/lessons/" + lesson._id;
+                    const options = {
+                        method : 'PUT',
+                        headers : {
+                            'Content-Type' : 'application/json'
+                        },
+                        body : JSON.stringify(updateBody)
+                    }
+                    let response = await (fetch(url, options));
                 }
             },
 
