@@ -70,20 +70,25 @@
 
             <!--Display lessons-->
             <div v-else>
-                <button class="checkout" @click="toggleCart" :disabled="!canShowCart">Checkout ({{
-                    numberOfItems}})</button>
+                <div class="lesson-toolbar">
+                    <div class="sorting-controls">
+                        <label for="sort-select">Sort lessons by:</label>
+                        <select id="sort-select" class="sort-select" v-model="sortType">
+                            <option disabled value="unknown">Choose a category</option>
+                            <option value="price">Price</option>
+                            <option value="availability">Availability</option>
+                            <option value="title">Subject</option>
+                            <option value="location">Location</option>
+                        </select>
+                        <button class="sortByPrice" @click="toggleSorting">
+                            {{ lessonSorted ? 'Sorting in Descending' : 'Sorting in Ascending' }}
+                        </button>
+                    </div>
+                    <button class="checkout" @click="toggleCart" :disabled="!canShowCart">
+                        Checkout ({{ numberOfItems }})
+                    </button>
 
-                <button class="sortByPrice" @click="toggleSorting">
-                    {{ lessonSorted ? 'Sorting in Descending' : 'Sorting in Ascending' }}
-                </button>
-                <p>Sort by: </p>
-                <select class=sort-select v-model="sortType">
-                    <option disabled value="unknown">Choose</option>
-                    <option value="price">Price</option>
-                    <option value="availability">Availability</option>
-                    <option value="title">Subject</option>
-                    <option value="loacation">Location</option>
-                </select>
+                </div>
 
                 <div v-for="lesson in sortedLessons">
                     <div class="lesson-grid"> <!-- Lesson cards -->
@@ -112,7 +117,7 @@
     </div>
 
     <script type="module">
-        const LESSON_URL = "http://localhost:3000"
+        const LESSON_URL = "https://m01034045-server.onrender.com"
         const { createApp } = Vue
         const lessonStore = createApp({
             data() {
@@ -237,12 +242,12 @@
                             body: JSON.stringify(orderData)
                         }
 
-                        let response = await(fetch(url, options));
+                        let response = await (fetch(url, options));
 
                         if (response.ok) {
                             const uniqueLessons = Object.values(this.displayUniqueLessons(this.cart));
 
-                            for(const item of uniqueLessons){
+                            for (const item of uniqueLessons) {
                                 await this.updateLesson(item.lesson, item.count);
                             }
                             alert("Thank you for your order! We will contact you shortly.");
@@ -261,18 +266,18 @@
                     return LESSON_URL + "/images/" + product.image;
                 },
 
-                async updateLesson(lesson, count){
+                async updateLesson(lesson, count) {
                     let updateBody = {
-                        availability : lesson.availability
+                        availability: lesson.availability
                     };
 
                     const url = LESSON_URL + "/lessons/" + lesson._id;
                     const options = {
-                        method : 'PUT',
-                        headers : {
-                            'Content-Type' : 'application/json'
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
                         },
-                        body : JSON.stringify(updateBody)
+                        body: JSON.stringify(updateBody)
                     }
                     let response = await (fetch(url, options));
                 }

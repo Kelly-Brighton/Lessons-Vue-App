@@ -69,16 +69,81 @@
     margin: 10px 0;
 }
 
-.checkout, .sortByPrice {
-    padding: 10px 20px;
-    background-color: #007bff;
+.lesson-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    margin: 20px 0 30px;
+    background-color: #f5f7fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+.sorting-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.sorting-controls label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+}
+
+.sort-select {
+    padding: 11px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+
+.sort-select:focus {
+    border-color: #0878f9;
+}
+
+.sortByPrice {
+    padding: 11px 16px;
+    background-color: #e8f1ff;
+    color: #0878f9;
+    border: 1px solid #c9ddff;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.sortByPrice:hover {
+    background-color: #d8e8ff;
+}
+
+.checkout {
+    padding: 12px 22px;
+    background-color: #0878f9;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 16px;
-    margin-bottom: 20px;
-    margin-left: 20px;
+    transition: 0.2s ease;
+    white-space: nowrap;
+}
+
+.checkout:hover:not(:disabled) {
+    background-color: #0665df;
+}
+
+.checkout:disabled {
+    background-color: #a9c9f2;
+    cursor: not-allowed;
 }
 
 .add-to-cart {
@@ -231,24 +296,27 @@
     font-weight: 600;
 }
 
-.sort-select {
-    padding: 10px 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    background-color: #ffffff;
-    color: #374151;
-    font-size: 14px;
-    cursor: pointer;
-    outline: none;
-}
-
-.sort-select:focus{
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-}
 
 
-@media (max-width: 600px) {
+@media (max-width: 650px) {
+    .lesson-toolbar{
+        flex-direction: column;
+        align-items: stretch;
+        gap: 18px;
+    }
+
+    .sorting-controls{
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sort-select{
+        width: 100%;
+    }
+
+    .sortByPrice, .checkout{
+        width: 100%;
+    }
 
     .checkout-panel {
         margin: 15px;
